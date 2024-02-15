@@ -221,6 +221,21 @@ const App = () => {
   }
 
 
+  const Calibrate = () => {
+    //BleManager.write("A8:42:E3:4C:8C:96","4fafc201-1fb5-459e-8fcc-c5c9c331914b","608e2c81-0afe-4019-aeb6-a5af9d0fe141")
+    BleManager.writeWithoutResponse("A8:42:E3:4C:8C:96","4fafc201-1fb5-459e-8fcc-c5c9c331914b","608e2c81-0afe-4019-aeb6-a5af9d0fe141", [1])
+    console.log("sending calibration flag")
+  }
+
+  const doneCalibration = () => {
+    BleManager.writeWithoutResponse("A8:42:E3:4C:8C:96","4fafc201-1fb5-459e-8fcc-c5c9c331914b","608e2c81-0afe-4019-aeb6-a5af9d0fe141", [0])
+    console.log("sending calibration finished flag")
+
+  }
+
+//
+//
+//
 
 
   return (
@@ -257,6 +272,18 @@ const App = () => {
           <TouchableOpacity activeOpacity={0.5} style={styles.buttonStyle} onPress={readData}>
             <Text style={styles.buttonTextStyle}>
               Read Bluetooth Data
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity activeOpacity={0.5} style={styles.buttonStyle} onPress={Calibrate}>
+            <Text style={styles.buttonTextStyle}>
+              Calibrate
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity activeOpacity={0.5} style={styles.buttonStyle} onPress={doneCalibration}>
+            <Text style={styles.buttonTextStyle}>
+              Done Calibration
             </Text>
           </TouchableOpacity>
 
