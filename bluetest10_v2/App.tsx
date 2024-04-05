@@ -25,7 +25,8 @@ var Buffer = require('buffer/').Buffer
 const BleManagerModule = NativeModules.BleManager;
 const BleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
-
+const glove_esp_macAddress = "24:D7:EB:10:F0:86"
+const personal_esp_macAddress = "A8:42:E3:4C:8C:96"
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -59,9 +60,11 @@ const App = () => {
   };
 
 
-
+//
   //'-------------useEffect hook, stuff in here runs on startup of app-----------
   useEffect(() => {
+
+
 
     // start bluetooth manager
     BleManager.start({showAlert: false}).then(() => {
@@ -71,14 +74,20 @@ const App = () => {
     //startScan(); //commented before
     startConnection();
     //collectServices();
-    readData();
-    readData_FSR(); 
-    
+    readData_Prox0();
+    readData_Prox1();
+    readData_Prox2();
+    readData_Prox3();
+    readData_FSR0(); 
+    readData_FSR1(); 
+    readData_FSR2(); 
+    readData_FSR3(); 
     //disconnectDevice();
     })
 
 
 
+    //
 //doing the bluetooth scan permission
     PermissionsAndroid.check(
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN
@@ -120,16 +129,31 @@ const App = () => {
       }
     });
 
-
+    
     //' Here we can set an interval and execute the read data functions continuosly
     // Set interval to execute the readData function every x milliseconds 
-    const intervalId = setInterval(readData, 100);
-    const intervalId2 = setInterval(readData_FSR, 100);
+    const intervalId = setInterval(readData_Prox0, 1000);
+    const intervalId2 = setInterval(readData_Prox1, 1000);
+    const intervalId3 = setInterval(readData_Prox2, 1000);
+    const intervalId4 = setInterval(readData_Prox3, 1000);
+    const intervalId5 = setInterval(readData_FSR0, 1000);
+    const intervalId6 = setInterval(readData_FSR1, 1000);
+    const intervalId7 = setInterval(readData_FSR2, 1000);
+    const intervalId8 = setInterval(readData_FSR3, 1000);
+    //
+    
 
     // Cleanup function to clear the interval when the component unmounts
     return () => {
       clearInterval(intervalId);
       clearInterval(intervalId2);
+      clearInterval(intervalId3);
+      clearInterval(intervalId4);
+      clearInterval(intervalId5);
+      clearInterval(intervalId6);
+      clearInterval(intervalId7);
+      clearInterval(intervalId8);
+
     };
 
 
@@ -157,7 +181,7 @@ const App = () => {
 
   //'the BleManager.connect method takes the MAC address not a uuid for service/characteristic
   const startConnection = () => {
-    BleManager.connect("A8:42:E3:4C:8C:96").then(() => {
+    BleManager.connect(glove_esp_macAddress).then(() => {
       console.log("connected to esp32")
     })
     .catch((error) => {
@@ -168,7 +192,7 @@ const App = () => {
 
 
   const collectServices = () => {
-    BleManager.retrieveServices("A8:42:E3:4C:8C:96").then((peripheralInfo) => {
+    BleManager.retrieveServices(glove_esp_macAddress).then((peripheralInfo) => {
       console.log("esp32 Peripheral info: ", peripheralInfo)
     }).catch((error) => {
       console.log(error)
@@ -176,46 +200,118 @@ const App = () => {
   }
 
 
-//' MAC (Media Access Control) address is A8:42:E3:4C:8C:96
+//' MAC (Media Access Control) address is glove_esp_macAddress
 //' serviceUUID is 4fafc201-1fb5-459e-8fcc-c5c9c331914b
 //' characteristicUUID for proximity sensor is beb5483e-36e1-4688-b7f5-ea07361b26a8
-  const readData = () => {
-    BleManager.read("A8:42:E3:4C:8C:96","4fafc201-1fb5-459e-8fcc-c5c9c331914b","beb5483e-36e1-4688-b7f5-ea07361b26a8").then((readData) => {
-      console.log("Read: " + readData)
-      console.log("converting")
-      console.log(readData)
-
+  const readData_Prox0 = () => {
+    BleManager.read(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","beb5483e-36e1-4688-b7f5-ea07361b26a8").then((readData) => {
 
       const buffer = Buffer.from(readData)
       const sensorData = buffer.readUInt8()
-      //const sensorData = buffer.readUInt16()
-      console.log("cleaned data taken from buffer...")
-      console.log(sensorData)
-      console.log("\n")
+
+      console.log("Prox0/thumb: " + sensorData)
+      //console.log("\n")
     })
   }
+
+
+  //' read data function for prox sensor 1
+  const readData_Prox1 = () => {
+    BleManager.read(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","f0a4c2a8-7816-40b6-9f97-81a303c7f5a2").then((readData) => {
+
+      const buffer = Buffer.from(readData)
+      const sensorData = buffer.readUInt8()
+
+      console.log("Prox1/pinky: " + sensorData)
+      //console.log("\n")
+    })
+  }
+
+
+  //' read data function for prox sensor 2
+  const readData_Prox2 = () => {
+    BleManager.read(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","2ba4f22d-63c7-41d5-a6ba-046dc9738ed9").then((readData) => {
+
+      const buffer = Buffer.from(readData)
+      const sensorData = buffer.readUInt8()
+
+      console.log("Prox2/ring: " + sensorData)
+      //console.log("\n")
+    })
+  }
+
+    //' read data function for prox sensor 3
+    const readData_Prox3 = () => {
+      BleManager.read(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","3345bc1a-0420-41ac-a39a-f174e20f1d28").then((readData) => {
+  
+        const buffer = Buffer.from(readData)
+        const sensorData = buffer.readUInt8()
+  
+        console.log("Prox3/index: " + sensorData)
+        //console.log("\n")
+      })
+    }
+
+
+
 
   //' read data function for the FSR
   //' Same MAC address and serviceUUID, but different Characteristic UUID, put the one for the FSR
-  const readData_FSR = () => {
-    BleManager.read("A8:42:E3:4C:8C:96","4fafc201-1fb5-459e-8fcc-c5c9c331914b","b4a3a889-cf5f-40f9-a1f2-ac515643ba81").then((readData) => {
-      console.log("Read: " + readData)
-      console.log(readData)
-
+  const readData_FSR0 = () => {
+    BleManager.read(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","b4a3a889-cf5f-40f9-a1f2-ac515643ba81").then((readData) => {
 
       const buffer = Buffer.from(readData)
       const sensorData = buffer.readUInt8()
-      //const sensorData = buffer.readUInt16()
-      console.log("FSR data...")
-      console.log(sensorData)
-      console.log("\n")
+
+      console.log("FSR0/index: " + sensorData)
+      //console.log("\n")
     })
   }
+
+
+
+  const readData_FSR1 = () => {
+    BleManager.read(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","df93ee6d-887c-48ec-a70b-f9107b249d98").then((readData) => {
+
+      const buffer = Buffer.from(readData)
+      const sensorData = buffer.readUInt8()
+
+      console.log("FSR1/middle: " + sensorData)
+      //console.log("\n")
+    })
+  }
+
+
+  const readData_FSR2 = () => {
+    BleManager.read(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","443a00f3-00bb-480a-b0f8-b656aad48f13").then((readData) => {
+
+      const buffer = Buffer.from(readData)
+      const sensorData = buffer.readUInt8()
+
+      console.log("FSR2/ring: " + sensorData)
+      //console.log("\n")
+    })
+  }
+
+
+  const readData_FSR3 = () => {
+    BleManager.read(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","0def7be7-5e56-4e3b-b214-a30f4065e618").then((readData) => {
+
+      const buffer = Buffer.from(readData)
+      const sensorData = buffer.readUInt8()
+
+      console.log("FSR3/pinky: " + sensorData)
+      //console.log("\n")
+    })
+  }
+
+
+
 
 
 
   const disconnectDevice = () => {
-    BleManager.disconnect("A8:42:E3:4C:8C:96").then(() => {
+    BleManager.disconnect(glove_esp_macAddress).then(() => {
       console.log("disconnected")
     })
   }
@@ -223,12 +319,12 @@ const App = () => {
 
   const Calibrate = () => {
     //BleManager.write("A8:42:E3:4C:8C:96","4fafc201-1fb5-459e-8fcc-c5c9c331914b","608e2c81-0afe-4019-aeb6-a5af9d0fe141")
-    BleManager.writeWithoutResponse("A8:42:E3:4C:8C:96","4fafc201-1fb5-459e-8fcc-c5c9c331914b","608e2c81-0afe-4019-aeb6-a5af9d0fe141", [1])
+    BleManager.writeWithoutResponse(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","608e2c81-0afe-4019-aeb6-a5af9d0fe141", [1])
     console.log("sending calibration flag")
   }
 
   const doneCalibration = () => {
-    BleManager.writeWithoutResponse("A8:42:E3:4C:8C:96","4fafc201-1fb5-459e-8fcc-c5c9c331914b","608e2c81-0afe-4019-aeb6-a5af9d0fe141", [0])
+    BleManager.writeWithoutResponse(glove_esp_macAddress,"4fafc201-1fb5-459e-8fcc-c5c9c331914b","608e2c81-0afe-4019-aeb6-a5af9d0fe141", [0])
     console.log("sending calibration finished flag")
 
   }
@@ -269,7 +365,7 @@ const App = () => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={0.5} style={styles.buttonStyle} onPress={readData}>
+          <TouchableOpacity activeOpacity={0.5} style={styles.buttonStyle} onPress={readData_Prox0}>
             <Text style={styles.buttonTextStyle}>
               Read Bluetooth Data
             </Text>
