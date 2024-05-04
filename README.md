@@ -1,6 +1,6 @@
 "# M2MELECFINAL" <br />
 
-First run the esp32 code from the Arduino IDE then run the react native code from vscode. Many issues can be fixed be reloading either file (while keeping the other running). <br />
+First run the esp32 code from the Arduino IDE then run the react native code from vscode. Many issues can be fixed by reloading either file (while keeping the other running). <br />
 
 ---running the esp32 code--- <br />
 Connect esp32, run code from arduino IDE <br />
